@@ -19,17 +19,23 @@ package io.github.leothawne.JavaCookies;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class CookieData {
-	private HashMap<UUID, Object> cookie;
+public class Cookie {
 	private UUID cookieId;
-	protected CookieData(final HashMap<UUID, Object> cookie, final UUID cookieId) {
-		this.cookie = cookie;
+	private HashMap<UUID, Object> cookie;
+	protected Cookie(final HashMap<UUID, Object> cookie, final UUID cookieId, Object value) {
+		cookie.put(cookieId, value);
 		this.cookieId = cookieId;
+		this.cookie = cookie;
 	}
-	public final Object getValue() {
-		return cookie.get(getUniqueId());
-	}
-	public final UUID getUniqueId() {
+	public UUID getUniqueId() {
 		return cookieId;
+	}
+	public final boolean setValue(final Object value) {
+		cookie.put(cookieId, value);
+		if(cookie.get(cookieId).equals(value)) return true;
+		return false;
+	}
+	public final CookieData getData() {
+		return new CookieData(cookie, cookieId);
 	}
 }
