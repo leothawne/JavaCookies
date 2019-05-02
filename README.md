@@ -1,2 +1,2 @@
 # JavaCookies
-Easily create cookies with Java Cookies.
+Storage tool for temporary data.
