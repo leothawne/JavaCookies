@@ -3,7 +3,6 @@ package io.github.leothawne.JavaCookies;
 import java.util.HashMap;
 import java.util.UUID;
 
-import io.github.leothawne.JavaCookies.data.CookieData;
 import io.github.leothawne.JavaCookies.exception.CookieAlreadyDefinedException;
 
 public final class CookieManager {

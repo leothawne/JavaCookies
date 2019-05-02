@@ -1,4 +1,4 @@
-package io.github.leothawne.JavaCookies.data;
+package io.github.leothawne.JavaCookies;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -6,7 +6,7 @@ import java.util.UUID;
 public class CookieData {
 	private final HashMap<UUID, Object> cookie;
 	private final UUID cookieId;
-	public CookieData(final HashMap<UUID, Object> cookie, final UUID cookieId) {
+	protected CookieData(final HashMap<UUID, Object> cookie, final UUID cookieId) {
 		this.cookie = cookie;
 		this.cookieId = cookieId;
 	}
