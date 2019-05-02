@@ -10,3 +10,4 @@ target/classes/io/github/leothawne/JavaCookies/CookieData.class
 .settings/org.eclipse.jdt.core.prefs
 .project
 .classpath
+/target/
