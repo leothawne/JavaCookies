@@ -9,3 +9,8 @@ target/classes/io/github/leothawne/JavaCookies/data/CookieData.class
 target/classes/META-INF/maven/io.github.leothawne/JavaCookies/pom.properties
 target/test-classes/io/github/leothawne/Cookies/AppTest.class
 target/test-classes/io/github/leothawne/Cookies/AppTest.class
+/target/
+.classpath
+.project
+.settings/org.eclipse.jdt.core.prefs
+.settings/org.eclipse.m2e.core.prefs
