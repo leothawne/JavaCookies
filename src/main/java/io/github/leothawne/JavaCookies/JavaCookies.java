@@ -20,7 +20,7 @@ import javax.swing.JOptionPane;
 
 import io.github.leothawne.JavaCookies.exception.CookieAlreadyDefinedException;
 
-public class JavaCookies {
+public final class JavaCookies {
 	private static final String vNumber = "0.0.2-SNAPSHOT";
 	private static final String vDate = "02/05/2019 [BRT]";
 	public static final void main(final String[] args) {
@@ -46,12 +46,11 @@ public class JavaCookies {
 					try {
 						final Cookie cookie = manager.createCookie();
 						cookie.setValue("This is the cookie " + i + "!");
-						final CookieData cookieData = cookie.getData();
-						System.out.println("Cookie unique id: " + cookieData.getUniqueId().toString());
-						System.out.println("Cookie value: " + cookieData.getValue().toString());
+						System.out.println("Cookie unique id: " + cookie.getUniqueId().toString());
+						System.out.println("Cookie value: " + cookie.getValue().toString());
 						System.out.println();
 						System.out.println("Deleting cookie " + i + "...");
-						manager.deleteCookie(cookieData.getUniqueId());
+						manager.deleteCookie(cookie.getUniqueId());
 					} catch (final CookieAlreadyDefinedException exception) {
 						System.err.println("Could not create cookie " + i + ".");
 						exception.printStackTrace();
