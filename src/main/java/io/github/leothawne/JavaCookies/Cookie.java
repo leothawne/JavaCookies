@@ -16,26 +16,35 @@
  */
 package io.github.leothawne.JavaCookies;
 
-import java.util.HashMap;
 import java.util.UUID;
 
 public final class Cookie {
+	private CookieManager cookieManager;
 	private UUID cookieId;
-	private HashMap<UUID, Object> cookie;
-	protected Cookie(final HashMap<UUID, Object> cookie, final UUID cookieId, Object value) {
-		cookie.put(cookieId, value);
+	private Object value;
+	private int timeout;
+	protected Cookie(final CookieManager cookieManager, final UUID cookieId, final Object value, final int timeout) {
+		this.cookieManager = cookieManager;
 		this.cookieId = cookieId;
-		this.cookie = cookie;
+		this.value = value;
+		this.timeout = timeout;
 	}
-	public UUID getUniqueId() {
-		return cookieId;
+	public final UUID getUniqueId() {
+		if(this.cookieManager.getCookie(this.cookieId) != null) return this.cookieId;
+		return null;
 	}
-	public final boolean setValue(final Object value) {
-		cookie.put(cookieId, value);
-		if(cookie.get(cookieId).equals(value)) return true;
-		return false;
+	public final void setValue(final Object value) {
+		if(this.cookieManager.getCookie(this.cookieId) != null) this.value = value;
 	}
 	public final Object getValue() {
-		return cookie.get(getUniqueId());
+		if(this.cookieManager.getCookie(this.cookieId) != null) return this.value;
+		return null;
+	}
+	public final void setTimeout(int timeout) {
+		if(this.cookieManager.getCookie(this.cookieId) != null) this.timeout = timeout;
+	}
+	public final int getTimeout() {
+		if(this.cookieManager.getCookie(this.cookieId) != null) return this.timeout;
+		return -1;
 	}
 }

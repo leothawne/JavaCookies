@@ -16,51 +16,72 @@
  */
 package io.github.leothawne.JavaCookies;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 import javax.swing.JOptionPane;
 
-import io.github.leothawne.JavaCookies.exception.CookieAlreadyDefinedException;
-
 public final class JavaCookies {
-	private static final String vNumber = "0.0.2-SNAPSHOT";
-	private static final String vDate = "02/05/2019 [BRT]";
 	public static final void main(final String[] args) {
 		if(args.length > 0) {
+			final JavaCookies program = new JavaCookies();
+			final PluginDescription pluginDescription = program.getPluginDescription();
 			if(args[0].equalsIgnoreCase("--version")) {
 				System.out.println();
-				System.out.println("Java Cookies v" + vNumber + " (" + vDate + ")");
-				System.out.print("GitHub: https://github.com/leothawne/JavaCookies");
+				System.out.println(pluginDescription.getName() + " v" + pluginDescription.getVersion());
+				System.out.println("\"" + pluginDescription.getDescription() + "\"");
 				System.out.println();
+				System.out.println("GitHub: \"" + pluginDescription.getGithub() + "\"");
 				System.exit(0);
 			}
 			if(args[0].equalsIgnoreCase("--debug")) {
 				System.out.println();
-				System.out.println("Java Cookies: Initiating testing sequence...");
-				final JavaCookies program = new JavaCookies();
-				final CookieManager manager = program.createCookieManager();
-				int i = 1;
-				while(i < 11) {
+				System.out.println(pluginDescription.getName() + ": Initiating testing sequence...");
+				final CookieManager cookieManager = program.createCookieManager();
+				for(int i = 1; i <= 100; i++) {
 					System.out.println();
 					System.out.println();
 					System.out.println("Creating cookie " + i + "...");
 					System.out.println();
-					try {
-						final Cookie cookie = manager.createCookie();
-						cookie.setValue("This is the cookie " + i + "!");
+					final Cookie cookie = cookieManager.createCookie("This is the cookie " + i + "!");
+					System.out.println("Cookie unique id: " + cookie.getUniqueId().toString());
+					System.out.println("Cookie value: " + cookie.getValue().toString());
+					System.out.println("Cookie timeout: " + cookie.getTimeout());
+				}
+				try {
+					final SimpleDateFormat formatter = new SimpleDateFormat("HH_mm_ss-dd_MM_yyyy");
+					cookieManager.saveToFile("debug-" + formatter.format(Calendar.getInstance().getTime()));
+				} catch (final JCDBFileHandlerException exception) {
+					exception.printStackTrace();
+				}
+				cookieManager.deleteAllCookies();
+				System.out.println();
+				System.out.println();
+				System.out.println("Testing sequence completed!");
+				System.exit(0);
+			}
+			if(args[0].equalsIgnoreCase("--extra-debug")) {
+				System.out.println();
+				System.out.println(pluginDescription.getName() + ": Initiating testing sequence...");
+				final CookieManager cookieManager = program.createCookieManager();
+				try {
+					cookieManager.loadFromFile("debug");
+					for(final Cookie cookie : cookieManager.getFormedCookies()) {
+						System.out.println();
+						System.out.println();
+						System.out.println("Loading cookie...");
+						System.out.println();
 						System.out.println("Cookie unique id: " + cookie.getUniqueId().toString());
 						System.out.println("Cookie value: " + cookie.getValue().toString());
-						System.out.println();
-						System.out.println("Deleting cookie " + i + "...");
-						manager.deleteCookie(cookie.getUniqueId());
-					} catch (final CookieAlreadyDefinedException exception) {
-						System.err.println("Could not create cookie " + i + ".");
-						exception.printStackTrace();
+						System.out.println("Cookie timeout: " + cookie.getTimeout());
 					}
-					i++;
+				} catch (final JCDBFileHandlerException exception) {
+					exception.printStackTrace();
 				}
+				cookieManager.deleteAllCookies();
 				System.out.println();
 				System.out.println();
-				System.out.print("Testing sequence completed!");
-				System.out.println();
+				System.out.println("Testing sequence completed!");
 				System.exit(0);
 			}
 		}
@@ -72,6 +93,9 @@ public final class JavaCookies {
 		System.exit(0);
 	}
 	public final CookieManager createCookieManager() {
-		return new CookieManager();
+		return new CookieManager(this);
+	}
+	public final PluginDescription getPluginDescription() {
+		return new PluginDescription();
 	}
 }

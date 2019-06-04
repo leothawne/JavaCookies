@@ -16,37 +16,128 @@
  */
 package io.github.leothawne.JavaCookies;
 
-import java.util.HashMap;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ConcurrentModificationException;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.UUID;
 
-import io.github.leothawne.JavaCookies.exception.CookieAlreadyDefinedException;
-
 public final class CookieManager {
-	protected CookieManager() {}
-	private final HashMap<UUID, Object> cookie = new HashMap<UUID, Object>();
-	public final Cookie createCookie(final UUID cookieId, final Object value) throws CookieAlreadyDefinedException {
-		if(cookie.get(cookieId) == null) {
-			return new Cookie(cookie, cookieId, value);
-		}
-		throw new CookieAlreadyDefinedException(cookieId.toString());
+	private JavaCookies instance;
+	protected CookieManager(final JavaCookies instance) {
+		this.instance = instance;
+		final CookieManager cookieManager = this;
+		new Runnable() {
+			@Override
+			public final void run() {
+				for(final UUID cookieId : cookies.keySet()) {
+					final Cookie cookie = cookieManager.getCookie(cookieId);
+					if(cookie.getTimeout() == 0) {
+						cookieManager.deleteCookie(cookie.getUniqueId());
+					} else if(cookie.getTimeout() > 0) {
+						cookie.setTimeout(cookie.getTimeout() - 1);
+					}
+				}
+			}
+		}.run();
 	}
-	public final Cookie createCookie(final UUID cookieId) throws CookieAlreadyDefinedException {
-		return createCookie(cookieId, null);
+	private final LinkedHashMap<UUID, Cookie> cookies = new LinkedHashMap<UUID, Cookie>();
+	private final Cookie createCookie(final UUID cookieId, final Object value, final int timeout) {
+		final Cookie cookie = new Cookie(this, cookieId, value, timeout);
+		this.cookies.put(cookieId, cookie);
+		return cookie;
 	}
-	public final Cookie createCookie() throws CookieAlreadyDefinedException {
+	public final Cookie createCookie(final Object value, final int timeout) {
 		UUID cookieId = UUID.randomUUID();
-		while(cookie.get(cookieId) != null) {
+		while(this.alreadyExists(cookieId)) {
 			cookieId = UUID.randomUUID();
 		}
-		return createCookie(cookieId, null);
+		return this.createCookie(cookieId, value, timeout);
 	}
-	public final boolean deleteCookie(final UUID cookieId) {
-		cookie.remove(cookieId);
-		if(cookie.get(cookieId) == null) return true;
-		return false;
+	public final Cookie createCookie(final Object value) {
+		return this.createCookie(value, -1);
+	}
+	public final LinkedList<Cookie> getFormedCookies(){
+		final LinkedList<Cookie> list = new LinkedList<Cookie>();
+		for(final UUID cookieId : this.cookies.keySet()) {
+			list.add(this.getCookie(cookieId));
+		}
+		return list;
+	}
+	public final void deleteCookie(final UUID cookieId) {
+		this.cookies.remove(cookieId);
+	}
+	public final void deleteAllCookies() {
+		try {
+			for(final UUID cookieId : this.cookies.keySet()) {
+				this.deleteCookie(cookieId);
+			}
+		} catch(final ConcurrentModificationException exception) {
+			
+		}
+	}
+	public final Cookie getCookie(final UUID cookieId) {
+		return this.cookies.get(cookieId);
 	}
 	public final boolean alreadyExists(final UUID cookieId) {
-		if(cookie.get(cookieId) != null) return true;
-		return false;
+		return this.getCookie(cookieId) != null;
+	}
+	public final LinkedList<UUID> getCookies(){
+		final LinkedList<UUID> cookies = new LinkedList<UUID>();
+		for(final UUID cookieId : this.cookies.keySet()) {
+			final Cookie cookie = this.getCookie(cookieId);
+			cookies.add(cookie.getUniqueId());
+		}
+		return cookies;
+	}
+	public final boolean saveToFile(final String fileName) throws JCDBFileHandlerException {
+		final File file = new File(this.instance.getPluginDescription().getCurrentPath(), fileName + ".jcdb");
+		if(!file.exists()) {
+			String contents = "";
+			for(final UUID cookieId : this.cookies.keySet()) {
+				final Cookie cookie = this.getCookie(cookieId);
+				contents = contents + cookieId.toString() + ">=!=<" + cookie.getValue().toString() + "<=!=>";
+			}
+			try {
+				final FileWriter writer = new FileWriter(file);
+				final BufferedWriter buffer = new BufferedWriter(writer);
+				buffer.write(contents);
+				buffer.close();
+				writer.close();
+				return true;
+			} catch (final IOException exception) {
+				throw new JCDBFileHandlerException("Unable to save to file.", exception);
+			}
+		} else throw new JCDBFileHandlerException(fileName + ".jcdb already exists.");
+	}
+	public final boolean loadFromFile(final String fileName) throws JCDBFileHandlerException {
+		final File file = new File(this.instance.getPluginDescription().getCurrentPath(), fileName + ".jcdb");
+		if(file.exists()) {
+			try {
+				final FileInputStream input = new FileInputStream(file.getAbsolutePath());
+				final BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+				String content = reader.readLine();
+				final StringBuilder builder = new StringBuilder();
+				while(content != null) {
+					builder.append(content);
+					content = reader.readLine();
+				}
+				reader.close();
+				input.close();
+				for(final String cookies : builder.toString().split("<=!=>")) {
+					final String[] args = cookies.split(">=!=<");
+					this.createCookie(UUID.fromString(args[0]), (Object) args[1], -1);
+				}
+				return true;
+			} catch (final IOException exception) {
+				throw new JCDBFileHandlerException("FileInputStream || BufferedReader: Unable to close.", exception);
+			}
+		} else throw new JCDBFileHandlerException(fileName + ".jcdb does not exist.");
 	}
 }

@@ -2,9 +2,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.github.leothawne</groupId>
 	<artifactId>JavaCookies</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.3-SNAPSHOT</version>
 	<name>Java Cookies</name>
-	<description></description>
+	<description>A cookies library in Java.</description>
 	<build>
 		<finalName>Java Cookies</finalName>
 		<plugins>
