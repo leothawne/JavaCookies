@@ -26,6 +26,8 @@ import java.io.InputStreamReader;
 import java.util.ConcurrentModificationException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 public final class CookieManager {
@@ -33,7 +35,8 @@ public final class CookieManager {
 	protected CookieManager(final JavaCookies instance) {
 		this.instance = instance;
 		final CookieManager cookieManager = this;
-		new Runnable() {
+		final Timer timer = new Timer();
+		timer.schedule(new TimerTask() {
 			@Override
 			public final void run() {
 				for(final UUID cookieId : cookies.keySet()) {
@@ -45,7 +48,7 @@ public final class CookieManager {
 					}
 				}
 			}
-		}.run();
+		}, 1000);
 	}
 	private final LinkedHashMap<UUID, Cookie> cookies = new LinkedHashMap<UUID, Cookie>();
 	private final Cookie createCookie(final UUID cookieId, final Object value, final int timeout) {

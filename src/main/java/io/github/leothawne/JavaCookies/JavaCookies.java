@@ -38,15 +38,15 @@ public final class JavaCookies {
 				System.out.println();
 				System.out.println(pluginDescription.getName() + ": Initiating testing sequence...");
 				final CookieManager cookieManager = program.createCookieManager();
-				for(int i = 1; i <= 100; i++) {
+				for(int i = 1; i <= 10000; i++) {
 					System.out.println();
 					System.out.println();
 					System.out.println("Creating cookie " + i + "...");
 					System.out.println();
-					final Cookie cookie = cookieManager.createCookie("This is the cookie " + i + "!");
+					final Cookie cookie = cookieManager.createCookie("This is the cookie " + i + "!", 1);
 					System.out.println("Cookie unique id: " + cookie.getUniqueId().toString());
 					System.out.println("Cookie value: " + cookie.getValue().toString());
-					System.out.println("Cookie timeout: " + cookie.getTimeout());
+					System.out.println("Cookie timeout: " + cookie.getTimeout() + "s");
 				}
 				try {
 					final SimpleDateFormat formatter = new SimpleDateFormat("HH_mm_ss-dd_MM_yyyy");
@@ -73,7 +73,7 @@ public final class JavaCookies {
 						System.out.println();
 						System.out.println("Cookie unique id: " + cookie.getUniqueId().toString());
 						System.out.println("Cookie value: " + cookie.getValue().toString());
-						System.out.println("Cookie timeout: " + cookie.getTimeout());
+						System.out.println("Cookie timeout: " + cookie.getTimeout() + "s");
 					}
 				} catch (final JCDBFileHandlerException exception) {
 					exception.printStackTrace();
